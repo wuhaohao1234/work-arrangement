@@ -1,23 +1,45 @@
-// const compose = (f: Function, g: Function) => (x: any) => f(g(x));
+// type Curr1<A, R> = (a: A) => R 
+// interface Curr2<A, B, R> {
+//   (a: A): Curr1<B, R>;
+//   (a: A, b: B): R;
+// }
+// interface Curr3<A, B, C, R> {
+//   (a: A): Curr2<B, C, R>;
+//   (a: A, b: B): Curr1<C, R>;
+//   (a: A, b: B, c: C): R;
+// }
+// interface Curr4<A, B, C, D, R> {
+//   (a: A): Curr3<B, C, D, R>;
+//   (a: A, b: B): Curr2<C, D, R>;
+//   (a: A, b: B, c: C): Curr1<D, R>;
+//   (a: A, b: B, c: C, d: D): R;
+// }
+// type IAdd =　<T>(a: T, b: T, c: T) => T
 
-const compose = (...args: Function[]): Function => {
-    console.log(args)
-    return (..._args: any[]) => {
-        if (args.length < 2) {
-            return args[0]()
-        }else if (args.length === 2) {
-            return args[0](args[1](_args))
-        }else {
-            let _result = args.shift()
-            return args[0](_result)
-        }
+function curry<T>(fn: Function, ...args: T[]) {
+    let length: number = fn.length
+    let lists: T[] = args || []
+    let listLen: number
+    return (..._args: T[]) => {
+        lists = [...lists, ..._args]
+        listLen = lists.length
+        if (listLen < length) {
+            const that: T[] = lists
+            lists = []
+            return curry(fn, ...that)
+          } else if (listLen === length) {
+            const that: T[] = lists
+            lists = []
+            return fn.apply(this, that)
+          }
     }
 }
-// compose函数可能写的有点问题
-const sum = (x: number, y: number): number => x + y
+function add(a: number, b: number, c: number): number {
+  return a + b + c
+}
 
-const ride = (x: number, y: number): number => x * x
+let resultFun = curry(add)
 
-let result = compose(sum, ride)
-
-console.log(result(1, 2))
+resultFun(1)(2)(3)
+resultFun(1, 2)(3)
+resultFun(1, 2, 3)

@@ -206,3 +206,6 @@ compose函数
 ```
 var compose = (...args) => (initValue) => args.reduceRight((a, c) => c(a), initValue)
 ```
+
+### 柯里化(curry)
+
